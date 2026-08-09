@@ -20,7 +20,7 @@ jobs:
                              -Name "SecurityLayer" -Value 0 -Force
 
           # Remove any existing rule with the same name to avoid duplication
-          netsh advfirewall firewall delete rule name="RDP-Tailscale"
+          netsh advfirewall firewall delete rule name="RDP-Tailscale" || exit 0
           
           # For testing, allow any incoming connection on port 3389
           netsh advfirewall firewall add rule name="RDP-Tailscale" `
@@ -97,14 +97,6 @@ jobs:
           Invoke-WebRequest -Uri $pcsx2Url -OutFile $pcsx2Zip
           Expand-Archive -Path $pcsx2Zip -DestinationPath "$desktop\PCSX2" -Force
           Remove-Item $pcsx2Zip -Force
-
-          # Download ePSXe (PS1)
-          Write-Host "Downloading ePSXe..."
-          $epsxeUrl = "https://www.epsxe.com/files/ePSXe205.zip"
-          $epsxeZip = "$env:TEMP\epsxe.zip"
-          Invoke-WebRequest -Uri $epsxeUrl -OutFile $epsxeZip
-          Expand-Archive -Path $epsxeZip -DestinationPath "$desktop\ePSXe_PS1" -Force
-          Remove-Item $epsxeZip -Force
 
           Write-Host "Emulators successfully downloaded and extracted to Desktop!"
       
