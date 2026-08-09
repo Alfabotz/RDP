@@ -1,4 +1,4 @@
-name: RDP
+Name: RDP
 
 on:
   workflow_dispatch:
@@ -26,7 +26,7 @@ jobs:
           netsh advfirewall firewall add rule name="RDP-Tailscale" `
             dir=in action=allow protocol=TCP localport=3389
 
-          # (Optional) Restart the Remote Desktop service to ensure changes take effect
+          # Restart the Remote Desktop service to ensure changes take effect
           Restart-Service -Name TermService -Force
 
       - name: Create RDP User with Secure Password
@@ -60,7 +60,7 @@ jobs:
       - name: Install Tailscale
         run: |
           $tsUrl = "https://pkgs.tailscale.com/stable/tailscale-setup-1.82.0-amd64.msi"
-          $installerPath = "$env:TEMP\\tailscale.msi"
+          $installerPath = "$env:TEMP\tailscale.msi"
           
           Invoke-WebRequest -Uri $tsUrl -OutFile $installerPath
           Start-Process msiexec.exe -ArgumentList "/i", "`"$installerPath`"", "/quiet", "/norestart" -Wait
@@ -85,6 +85,28 @@ jobs:
               exit 1
           }
           echo "TAILSCALE_IP=$tsIP" >> $env:GITHUB_ENV
+
+      - name: Download Emulators (PCSX & PCSX2)
+        run: |
+          $desktop = [Environment]::GetFolderPath("Desktop")
+          
+          # Download PCSX2 (PS2)
+          Write-Host "Downloading PCSX2..."
+          $pcsx2Url = "https://github.com/PCSX2/pcsx2/releases/download/v2.0.2/pcsx2-v2.0.2-windows-x64-Qt.zip"
+          $pcsx2Zip = "$env:TEMP\pcsx2.zip"
+          Invoke-WebRequest -Uri $pcsx2Url -OutFile $pcsx2Zip
+          Expand-Archive -Path $pcsx2Zip -DestinationPath "$desktop\PCSX2" -Force
+          Remove-Item $pcsx2Zip -Force
+
+          # Download ePSXe (PS1)
+          Write-Host "Downloading ePSXe..."
+          $epsxeUrl = "https://www.epsxe.com/files/ePSXe205.zip"
+          $epsxeZip = "$env:TEMP\epsxe.zip"
+          Invoke-WebRequest -Uri $epsxeUrl -OutFile $epsxeZip
+          Expand-Archive -Path $epsxeZip -DestinationPath "$desktop\ePSXe_PS1" -Force
+          Remove-Item $epsxeZip -Force
+
+          Write-Host "Emulators successfully downloaded and extracted to Desktop!"
       
       - name: Verify RDP Accessibility
         run: |
