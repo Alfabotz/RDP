@@ -1,4 +1,4 @@
-name: RDP
+Name: RDP
 
 on:
   workflow_dispatch:
@@ -28,6 +28,13 @@ jobs:
 
           # Restart the Remote Desktop service to ensure changes take effect
           Restart-Service -Name TermService -Force
+
+      # --- STEP TAMBAHAN UNTUK EXPAND DISK ---
+      - name: Expand C Drive Storage
+        run: |
+          $maxSize = (Get-PartitionSupportedSize -DriveLetter C).SizeMax
+          Resize-Partition -DriveLetter C -Size $maxSize
+          Get-Volume -DriveLetter C
 
       - name: Create RDP User with Secure Password
         run: |
@@ -86,8 +93,6 @@ jobs:
           }
           echo "TAILSCALE_IP=$tsIP" >> $env:GITHUB_ENV
 
-      
-      
       - name: Verify RDP Accessibility
         run: |
           Write-Host "Tailscale IP: $env:TAILSCALE_IP"
