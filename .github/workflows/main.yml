@@ -30,11 +30,7 @@ jobs:
           Restart-Service -Name TermService -Force
 
       # --- STEP TAMBAHAN UNTUK EXPAND DISK ---
-      - name: Expand C Drive Storage
-        run: |
-          $maxSize = (Get-PartitionSupportedSize -DriveLetter C).SizeMax
-          Resize-Partition -DriveLetter C -Size $maxSize
-          Get-Volume -DriveLetter C
+      
 
       - name: Create RDP User with Secure Password
         run: |
